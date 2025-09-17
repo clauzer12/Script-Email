@@ -1,0 +1,13 @@
+#!/bin/bash
+#script
+
+file=$*;
+while IFS=',' read -r f1
+do
+
+i=`zmarchiveconfig enable $f1 zimbraCOSId 31f2b95b-545a-4b95-9650-e7010df3908f`;
+j=`zmprov ga $f1.archive  | grep -e "# name" -e  zimbraMailHost -e zimbraCOSId`;
+
+echo "Archiving for $f1 has been enabled $i";
+echo $j;
+done < "$file"
