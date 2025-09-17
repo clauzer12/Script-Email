@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -uf -o pipefail
+
+# only zimbra can run this script
+if [[ $(id -nu) != 'zimbra' ]]; then
+    printf "[\e[31mERROR\e[0m] %s\n" "run as zimbra in mailbox node!"
+    exit 1
+fi
+
+zmmbox='/opt/zimbra/bin/zmmailbox -z -m'
+zmprov='/opt/zimbra/bin/zmprov -l'
+
+search_senders=()         # array of spam senders
+search_subjects=()        # array of spam subjects
+search_pattern=""         # final search query
+list_user_file=""         # file containing list of users
+list_is_file=false        # whether user list is from file
+
+usage() {
+    local prog="$(basename "$0")"
+    cat <<- eom
+Remove spam messages by multiple senders and/or subjects.
+
+Options:
+  -h            Show this help
+  -S <senders>  Add one or more spam senders (quoted space-separated)
+                Example: -S "spam1@example.com spam2@example.com"
+  -T <subjects> Add one or more spam subjects (quoted space-separated)
+                Example: -T "invoice promo"
+  -F <file>     File containing spam senders (one per line)
+  -G <file>     File containing spam subjects (one per line)
+  -f <file>     File containing list of users to clean (optional)
+
+Usage:
+  \$prog -S "spam1@example.com spam2@example.com" -T "invoice promo" user1@example.com user2@example.com
+  \$prog -F senders.txt -G subjects.txt -f users.txt
+eom
+    exit 1
+}
+
+build_search_pattern() {
+    if [[ ${#search_senders[@]} -eq 0 && ${#search_subjects[@]} -eq 0 && -z "${search_pattern}" ]]; then
+        printf "[\e[31mERROR\e[0m] %s\n" "at least one sender, subject, or full search pattern required!"
+        exit 1
+    fi
+
+    if [[ -n "${search_pattern}" ]]; then
+        return 0
+    fi
