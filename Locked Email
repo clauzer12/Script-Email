@@ -1,0 +1,27 @@
+#SEBELUM MENJALANKAN SCRIPT INI, BUAT FILE BERNAMA list-user.txt terlebih dahulu yang berisi list akun
+#!/bin/bash
+
+# Cek apakah file pengguna ada
+if [ ! -f "list-user.txt" ]; then
+  echo "File users.txt tidak ditemukan!"
+  exit 1
+fi
+
+# Loop melalui setiap akun di dalam users.txt
+while IFS= read -r email; do
+  # Periksa apakah email kosong
+  if [ -z "$email" ]; then
+    continue
+  fi
+
+  echo "Mengunci akun: $email"
+
+  # Perintah untuk mengunci akun
+  zmprov ma "$email" zimbraAccountStatus locked
+
+  if [ $? -eq 0 ]; then
+    echo "Akun $email berhasil dikunci."
+  else
+    echo "Gagal mengunci akun $email."
+  fi
+done < list-user.txt
