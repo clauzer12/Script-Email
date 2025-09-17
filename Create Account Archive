@@ -11,3 +11,5 @@ j=`zmprov ga $f1.archive  | grep -e "# name" -e  zimbraMailHost -e zimbraCOSId`;
 echo "Archiving for $f1 has been enabled $i";
 echo $j;
 done < "$file"
+
+# Cara menjalankannya ./create-archive.sh list-akun.txt
