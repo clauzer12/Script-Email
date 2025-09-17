@@ -1,0 +1,28 @@
+# SCRIPT INI DIGUNAKAN UNTUK MENARIK LIST AKUN ZIMBRA BERDASARKAN DESKRIPSI
+#!/bin/bash
+
+# Variabel untuk menyimpan deskripsi yang dicari
+DESKRIPSI="deskripsi_yang_dicari"
+
+# Nama file CSV untuk menyimpan hasil
+CSV_FILE=/tmp/hasil_akun.csv
+
+# Header untuk file CSV
+echo "Akun,Deskripsi" > $CSV_FILE
+
+# Mendapatkan list semua akun di Zimbra
+AKUN_LIST=$(zmprov -l gaa)
+
+# Loop melalui setiap akun
+for AKUN in $AKUN_LIST; do
+    # Mendapatkan deskripsi akun
+    DESKRIPSI_AKUN=$(zmprov ga $AKUN | grep "description:" | cut -d " " -f 2-)
+    
+    # Memeriksa apakah deskripsi akun sesuai dengan yang dicari
+    if [[ "$DESKRIPSI_AKUN" == *"$DESKRIPSI"* ]]; then
+        # Menulis hasil ke file CSV
+        echo "$AKUN,\"$DESKRIPSI_AKUN\"" >> $CSV_FILE
+    fi
+done
+
+echo "Hasil telah disimpan ke dalam file $CSV_FILE"
