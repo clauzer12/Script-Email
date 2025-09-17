@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# File output
+OUTPUT_FILE="/tmp/quota_usage.txt"
+
+# Hapus file lama jika ada
+> "$OUTPUT_FILE"
+
+# Loop untuk mailbox1 hingga mailbox9
+for i in {1..9}; do
+    MAILBOX="mailbox${i}.kemdikbud.go.id"
+    echo "Checking quota for: $MAILBOX"
+    
+    # Jalankan perintah zmprov gqu dan cari deskripsi akun tertentu
+    zmprov gqu "$MAILBOX" | grep -i 'Deskripsi_Akun' >> "$OUTPUT_FILE"
+
+done
+
+echo "Quota usage has been saved to $OUTPUT_FILE"
+
+# Tampilkan isi file output untuk verifikasi
+cat "$OUTPUT_FILE"
